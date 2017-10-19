@@ -1,3 +1,11 @@
+#include <pthread.h>
+#include <stdio.h>
+
+void createTriage();
+void getPatient();
+void doctorGoToWork();
+void createDoctorProcs();
+void readConfig();
 struct patient {
 	char * name;
 	int arrival; //order
