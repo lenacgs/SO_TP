@@ -1,11 +1,15 @@
 #include <pthread.h>
 #include <stdio.h>
 
+int shmid;
+
+
 void createTriage();
 void getPatient();
 void doctorGoToWork();
 void createDoctorProcs();
 void readConfig();
+
 struct patient {
 	char * name;
 	int arrival; //order
@@ -13,7 +17,7 @@ struct patient {
 	int triage; //in seconds
 	int appointment; //in seconds
 	int priority; //1, 2 or 3
-}
+} Patient;
 
 struct stats { //guarda as informações de todos os pacientes
 	int triage_total; //incrementada sempre que um paciente é triado
@@ -22,4 +26,4 @@ struct stats { //guarda as informações de todos os pacientes
 	float * time_mqueue; //array de momentos: quando cada paciente entra na MQ
 	float * time_beg_app; //array de momentos: quando cada paciente entra na consulta
 	float * time_end_app; //array de momentos: quando cada paciente sai na consulta
-}
+} Stats;
