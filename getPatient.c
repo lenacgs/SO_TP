@@ -1,12 +1,5 @@
-void getPatient() {
+void getPatientQ() {
 
-	//ir buscar paciente à MQ
+	//ir buscar paciente à queue
 
-	//registar log do paciente no sistema
-
-	wait(patient.duration); //confirmar se é mesmo para utilizar um wait()
-
-	//registar saida do paciente no sistema
-
-	//apagar paciente
 }

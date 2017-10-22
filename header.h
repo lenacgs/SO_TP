@@ -4,6 +4,8 @@
 #include <unistd.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
+#include <pthread.h>
+#include <semaphore.h>
 
 
 #define VECTOR_SIZE 10
@@ -32,7 +34,8 @@ int n_triage;
 int n_doctors;
 int shift_dur; //in seconds
 int mq_max;
-
+pthread_t my_thread[n_triage];
+int triageIds[n_triage];
 int shmid;
 Stats *shared_var;
 

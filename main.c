@@ -19,8 +19,14 @@ void main() {
 	#endif
 	
 	//create Doctor processes
+	//get patient from MQ
 	for (i=0; i<n_doctors; i++)
 		createDoctorProcs();
 
+	//create triage threads
+	for (i=0; i<n_triage; i++)
+		createTriage(i);
+
+	//read shared memory and print stats
 
 }
