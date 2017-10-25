@@ -8,7 +8,7 @@ void createTriage(int i) {
 		exit(0);
 	}
 	#ifdef DEBUG
-	printf("Triage thread created.");
+	printf("\nTriage thread created.");
 	#endif
 
 }

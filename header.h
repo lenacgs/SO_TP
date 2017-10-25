@@ -30,19 +30,23 @@ typedef struct stats { //guarda as informações de todos os pacientes
 	float * time_end_app; //array de momentos: quando cada paciente sai na consulta
 } Stats;
 
-int n_triage;
-int n_doctors;
-int shift_dur; //in seconds
-int mq_max;
-pthread_t my_thread[n_triage];
-int triageIds[n_triage];
+typedef struct config {
+	int n_triage;
+	int n_doctors;
+	int shift_dur;
+	int mq_max;
+} Config;
+
+pthread_t *my_thread;
+int *triageIds;
 int shmid;
 Stats *shared_var;
 
 
 void createTriage();
-void getPatient();
+Patient getPatient();
 void doctorGoToWork();
 void createDoctorProcs();
 void readConfig();
 void createShm();
+void *triageGoToWork(int id);

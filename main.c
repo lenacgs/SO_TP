@@ -1,32 +1,36 @@
 #include "header.h"
 
-void main() {
+int main() {
 	int i;
 	//processo principal
 
 	//read file config.txt
-	readConfig(); 
+	Config *config = (Config*)malloc(sizeof(Config));
+	readConfig(config); 
+
 	//test
 	#ifdef DEBUG
-	printf("n_triage: %d\nn_doctors: %d\nshift_dur: %d\nmq_max: %d\n", n_triage, n_doctors, shift_dur, mq_max);
+	printf("n_triage: %d\nn_doctors: %d\nshift_dur: %d\nmq_max: %d\n", config->n_triage, config->n_doctors, config->shift_dur, config->mq_max);
 	#endif
 
-	//create shared memory
+	//create shared memory & print stats
 	createShm();
-	//test
 	#ifdef DEBUG
 	printf("triage_total: %d\nappointment_total:%d\n", shared_var->triage_total, shared_var->appointment_total);
 	#endif
 	
 	//create Doctor processes
 	//get patient from MQ
-	for (i=0; i<n_doctors; i++)
+	for (i=0; i<config->n_doctors; i++)
 		createDoctorProcs();
 
 	//create triage threads
-	for (i=0; i<n_triage; i++)
+	triageIds = (int*)malloc(config->n_triage * sizeof(int)); //aloca memoria para o numero de triagens em struct config
+	my_thread = (pthread_t*)malloc(config->n_triage * sizeof(pthread_t));
+	for (i=0; i<config->n_triage; i++)
 		createTriage(i);
 
 	//read shared memory and print stats
+	return 0;
 
 }

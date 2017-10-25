@@ -2,9 +2,9 @@
 
 void createDoctorProcs() {
 	if (fork() == 0) {
-		printf("Doctor process with PID:%d created.\n", getpid());
+		printf("\nDoctor process with PID:%d created.", getpid());
 		//DoctorgoToWork();
-		printf("Doctor process with PID: %d --- Shift finished.\nDoctor process leaving work.\n", getpid());
+		printf("\nDoctor process with PID: %d --- Shift finished.\nDoctor process leaving work.", getpid());
 		exit(0);
 	}
 }

@@ -1,6 +1,6 @@
 #include "header.h"
 
-void readConfig() {
+void readConfig(Config *config) {
 	int val[4], i=0;
 	FILE * file;
 	file = fopen("Config.txt", "r");
@@ -9,10 +9,10 @@ void readConfig() {
 		while (fscanf(file, "%d", &val[i]) != EOF)
 			i++;
 
-		n_triage = val[0];
-		n_doctors = val[1];
-		shift_dur = val[2];
-		mq_max = val[3];
+		config->n_triage = val[0];
+		config->n_doctors = val[1];
+		config->shift_dur = val[2];
+		config->mq_max = val[3];
 	}
 	fclose (file);
 }
