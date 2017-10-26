@@ -6,9 +6,10 @@
 #include <sys/shm.h>
 #include <pthread.h>
 #include <semaphore.h>
+#include <time.h>
 
 
-#define VECTOR_SIZE 10
+#define VECTOR_SIZE 10 //number of patients
 #define DEBUG
 
 typedef struct patient {
