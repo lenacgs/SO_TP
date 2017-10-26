@@ -7,8 +7,12 @@ void createShm() {
 	//initialize shared var
 	shared_var->triage_total = 0;
 	shared_var->appointment_total = 0;
-	shared_var->time_queue = (float*)malloc(VECTOR_SIZE * sizeof(float));
-	shared_var->time_mqueue = (float*)malloc(VECTOR_SIZE * sizeof(float));
-	shared_var->time_beg_app = (float*)malloc(VECTOR_SIZE * sizeof(float));
-	shared_var->time_end_app = (float*)malloc(VECTOR_SIZE * sizeof(float));
+
+	#ifdef DEBUG
+	printf("%d %d", shared_var->triage_total, shared_var->appointment_total);
+	#endif
+	shared_var->time_queue = (clock_t*)malloc(VECTOR_SIZE * sizeof(clock_t));
+	shared_var->time_mqueue = (clock_t*)malloc(VECTOR_SIZE * sizeof(clock_t));
+	shared_var->time_beg_app = (clock_t*)malloc(VECTOR_SIZE * sizeof(clock_t));
+	shared_var->time_end_app = (clock_t*)malloc(VECTOR_SIZE * sizeof(clock_t));
 }

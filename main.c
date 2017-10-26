@@ -3,10 +3,10 @@
 int main() {
 	int i;
 	//processo principal
-
+	
 	//read file config.txt
-	Config *config = (Config*)malloc(sizeof(Config));
-	readConfig(config); 
+	config = (Config*)malloc(sizeof(Config));
+	readConfig(); 
 
 	//test
 	#ifdef DEBUG

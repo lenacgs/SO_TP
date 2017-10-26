@@ -8,5 +8,5 @@ void *triageGoToWork(int id) {
 
 	//atribui ao paciente uma prioridade na MQ
 	//sleep(patient.triage);
-	
+	return(NULL);
 }

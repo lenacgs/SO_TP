@@ -25,10 +25,10 @@ typedef struct stats { //guarda as informações de todos os pacientes
 	int * attach;
 	int triage_total; //incrementada sempre que um paciente é triado
 	int appointment_total; //incrementada sempre que um paciente entre na consulta
-	float * time_queue; //array de momentos: quando cada paciente entre na queue 
-	float * time_mqueue; //array de momentos: quando cada paciente entra na MQ
-	float * time_beg_app; //array de momentos: quando cada paciente entra na consulta
-	float * time_end_app; //array de momentos: quando cada paciente sai na consulta
+	clock_t * time_queue; //array de momentos: quando cada paciente entre na queue 
+	clock_t * time_mqueue; //array de momentos: quando cada paciente entra na MQ
+	clock_t * time_beg_app; //array de momentos: quando cada paciente entra na consulta
+	clock_t * time_end_app; //array de momentos: quando cada paciente sai na consulta
 } Stats;
 
 typedef struct config {
@@ -42,10 +42,10 @@ pthread_t *my_thread;
 int *triageIds;
 int shmid;
 Stats *shared_var;
+Config *config;
 
 
 void createTriage();
-Patient getPatient();
 void doctorGoToWork();
 void createDoctorProcs();
 void readConfig();
