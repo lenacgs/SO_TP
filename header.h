@@ -50,4 +50,4 @@ void doctorGoToWork();
 void createDoctorProcs();
 void readConfig();
 void createShm();
-void *triageGoToWork(int id);
+void *triageGoToWork(void * id);

@@ -1,14 +1,12 @@
 #include "header.h"
-
+//processo principal
 int main() {
 	int i;
-	//processo principal
 	
 	//read file config.txt
 	config = (Config*)malloc(sizeof(Config));
-	readConfig(); 
-
-	//test
+	readConfig();
+	
 	#ifdef DEBUG
 	printf("n_triage: %d\nn_doctors: %d\nshift_dur: %d\nmq_max: %d\n", config->n_triage, config->n_doctors, config->shift_dur, config->mq_max);
 	#endif

@@ -1,7 +1,8 @@
 #include "header.h"
 
-void *triageGoToWork(int id) {
+void *triageGoToWork(void * id) {
 	//Patient patient;
+	//e preciso fazer um cast para inteiro do id, caso queiramos que o ponteiro seja inteiro
 	//get patient from queue
 	//patient = getPatient();
 	//registar paciente no log

@@ -1,6 +1,6 @@
 #include "header.h"
 
-void readConfig(Config *config) {
+void readConfig() {
 	int val[4], i=0;
 	FILE * file;
 	file = fopen("Config.txt", "r");
