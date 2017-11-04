@@ -15,14 +15,13 @@
 typedef struct patient {
 	char * name;
 	int arrival; //order
-	int arrival_time; //in seconds
+	clock_t arrival_time; //in seconds
 	int triage; //in seconds
 	int appointment; //in seconds
 	int priority; //1, 2 or 3
 } Patient;
 
 typedef struct stats { //guarda as informações de todos os pacientes
-	int * attach;
 	int triage_total; //incrementada sempre que um paciente é triado
 	int appointment_total; //incrementada sempre que um paciente entre na consulta
 	clock_t * time_queue; //array de momentos: quando cada paciente entre na queue 
@@ -51,3 +50,5 @@ void createDoctorProcs();
 void readConfig();
 void createShm();
 void *triageGoToWork(void * id);
+void writeStatsDocs(clock_t start, clock_t end);
+void writeStatsTriage(clock_t end);

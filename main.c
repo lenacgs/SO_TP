@@ -29,6 +29,7 @@ int main() {
 		createTriage(i);
 
 	//read shared memory and print stats
+	printf("End of program");
 	return 0;
 
 }
