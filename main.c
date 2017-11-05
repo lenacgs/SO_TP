@@ -18,9 +18,14 @@ int main() {
 	#endif
 	
 	//create Doctor processes
-	//get patient from MQ
-	for (i=0; i<config->n_doctors; i++)
-		createDoctorProcs();
+	int n_procs = 0;
+	while (1) {
+		if (n_procs<config->n_doctors) {
+			createDoctorProcs();
+			n_procs++;
+		}
+	}
+	wait(NULL);
 
 	//create triage threads
 	triageIds = (int*)malloc(config->n_triage * sizeof(int)); //aloca memoria para o numero de triagens em struct config
