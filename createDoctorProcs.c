@@ -4,8 +4,8 @@ void createDoctorProcs() {
 	if (fork() == 0) {
 		printf("\nDoctor process with PID:%d created.\n", getpid());
 		doctorGoToWork();
-		printf("\nDoctor process with PID: %d --- Shift finished.\nDoctor process leaving work.", getpid());
-		exit(0);
-		// quando um doutor morre, outro tem que ser criado
+		printf("\nDoctor process with PID: %d --- Shift finished.\nDoctor process leaving work.\n", getpid());
+		sem_post(&sem);
+		kill(getpid(), SIGKILL);
 	}
 }

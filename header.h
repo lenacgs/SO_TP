@@ -3,10 +3,13 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/ipc.h>
+#include <sys/ipc.h>
+#include <sys/sem.h>
 #include <sys/shm.h>
 #include <pthread.h>
 #include <semaphore.h>
 #include <time.h>
+#include <signal.h>
 
 
 #define VECTOR_SIZE 10 //number of patients
@@ -42,7 +45,7 @@ int *triageIds;
 int shmid;
 Stats *shared_var;
 Config *config;
-
+sem_t sem;
 
 void createTriage();
 void doctorGoToWork();

@@ -27,14 +27,23 @@ int main() {
 	}
 	wait(NULL);
 
-	//create triage threads
+	//createing triage threads
 	triageIds = (int*)malloc(config->n_triage * sizeof(int)); //aloca memoria para o numero de triagens em struct config
 	my_thread = (pthread_t*)malloc(config->n_triage * sizeof(pthread_t));
 	for (i=0; i<config->n_triage; i++)
 		createTriage(i);
 
-	//read shared memory and print stats
-	printf("End of program");
-	return 0;
+	//sychronizing creation of doctor processes
+	sem_init(&sem, config->n_doctors, 0);
+	while (1) {
+		sem_wait(&sem);
+		createDoctorProcs();
+	}
+
+	//readint shared memory & printint stats
+
+	//destroying resources when signaled
+	sem_destroy(&sem);
+
 
 }
