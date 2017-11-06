@@ -7,6 +7,5 @@ void createDoctorProcs() {
 		printf("\nDoctor process with PID: %d --- Shift finished.\nDoctor process leaving work.", getpid());
 		exit(0);
 		// quando um doutor morre, outro tem que ser criado
-
 	}
 }
