@@ -40,11 +40,15 @@ typedef struct config {
 	int mq_max;
 } Config;
 
+typedef struct mem_cell {
+	Config * config;
+	Stats * stats;
+} mem_cell;
+
 pthread_t *my_thread;
 int *triageIds;
 int shmid;
-Stats *shared_var;
-Config *config;
+mem_cell *shared_var;
 sem_t sem;
 
 void createTriage();
