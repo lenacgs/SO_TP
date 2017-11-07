@@ -14,6 +14,7 @@
 
 #define VECTOR_SIZE 10 //number of patients
 #define DEBUG
+#define SEM_PROCESSES "sem_processes"
 
 typedef struct patient {
 	char * name;
@@ -40,22 +41,34 @@ typedef struct config {
 	int mq_max;
 } Config;
 
+typedef struct semaphores {
+	sem_t * sem_processes;
+	int nextin;
+} Semaphores;
+
 typedef struct mem_cell {
 	Config * config;
 	Stats * stats;
+	Semaphores * semaphores;
 } mem_cell;
 
-pthread_t *my_thread;
-int *triageIds;
+pthread_t *threads;
+int *threadIds;
+pid_t *processes;
 int shmid;
 mem_cell *shared_var;
-sem_t sem;
 
-void createTriage();
-void doctorGoToWork();
-void createDoctorProcs();
-void readConfig();
-void createShm();
+void init();
+void create_thread();
+void doctor_worker();
+void create_process();
+void read_config();
+void init_stats();
+void create_shm();
+void create_semaphors();
 void *triageGoToWork(void * id);
 void writeStatsDocs(clock_t start, clock_t end);
 void writeStatsTriage(clock_t end);
+void init_signal_handling();
+void terminate();
+void signal_handling(int signo);
