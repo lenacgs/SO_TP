@@ -2,9 +2,6 @@
 
 void terminate() {
 	int i;
-	
-
-	printf("\nShared memory detached.");
 
 	for (i=0; i<shared_var->config->n_doctors; i++) {
 		if (processes[i] != (pid_t)NULL) {
@@ -19,6 +16,7 @@ void terminate() {
 	printf("\nSEM_PROCESSES unlinked.");
 
 	shmctl(shmid, IPC_RMID, NULL);
+	printf("\nShared memory detached.");
 
 	for (i=0; i<shared_var->config->n_triage; i++) {
 		if (threads[i] != (pthread_t)NULL) {
@@ -30,5 +28,5 @@ void terminate() {
 	//remove semaphores
 
 	printf("\nAll resources have been terminated.");
-	return;
+	exit(0);
 }

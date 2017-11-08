@@ -60,15 +60,16 @@ mem_cell *shared_var;
 
 void init();
 void create_thread();
-void doctor_worker();
 void create_process();
+void init_signal_handling();
+void signal_handling(int signo);
 void read_config();
 void init_stats();
 void create_shm();
 void create_semaphors();
-void *triageGoToWork(void * id);
-void writeStatsDocs(clock_t start, clock_t end);
-void writeStatsTriage(clock_t end);
-void init_signal_handling();
+void doctor_worker();
+void * thread_worker(void * id);
+void write_stats_docs(clock_t start, clock_t end);
+void write_stats_triage(clock_t end);
 void terminate();
-void signal_handling(int signo);
+

@@ -1,16 +1,9 @@
 #include "header.h"
 
-void *triageGoToWork(void * triage_id) {
+void * thread_worker(void * triage_id) {
 	int id = *((int*)triage_id);
-	//Patient patient;
-	//e preciso fazer um cast para inteiro do id, caso queiramos que o ponteiro seja inteiro
-	//get patient from queue
-	//patient = getPatient();
-	//registar paciente no log
-
-	//atribui ao paciente uma prioridade na MQ
 	//falta passar como argumento o parametro arrival_time do paciente, para ser escrito nas estatisticas
-	writeStatsTriage(clock());
+	write_stats_triage(clock());
 	return(NULL);
 }
 
@@ -18,10 +11,15 @@ void doctor_worker() {
 	clock_t start = clock();
 	clock_t end = clock();
 	int shift_time = (end - start) / CLOCKS_PER_SEC;
+	#ifdef DEBUG
+	printf("\nDoctor: %d in", getpid());
+	#endif
 	while (/*getPatientQ() && */((int)shift_time < shared_var->config->shift_dur)){
 		end = clock();
 		shift_time = (end - start) / CLOCKS_PER_SEC;
 	}
-	writeStatsDocs(start, clock());
-	waitpid(getpid(), NULL, WNOHANG);
+	#ifdef DEBUG
+	printf("\nDoctor: %d out", getpid());
+	#endif
+	write_stats_docs(start, clock());
 }

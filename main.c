@@ -51,22 +51,20 @@ void read_config() {
 
 void create_process(int i) {
 
-	processes[i] = fork();
-
-	if (processes[i] < 0) {
+	if ((processes[i] = fork()) < 0) {
 		perror("Error creating new doctor: ");
 		return;
 	}
 	else {
 		#ifdef DEBUG
-		printf("\nDoctor process with PID:%d created.", getpid());
+		printf("\nNew doctor:%d created.", getpid());
 		#endif
 		doctor_worker();
+		//sem_post(shared_var->semaphores->sem_processes);
 		#ifdef DEBUG
-		printf("\nDoctor process with PID: %d --- Shift finished.Doctor process leaving work.", getpid());
+		printf("\nDoctor: %d dying", getpid());
 		#endif
-		sem_post(shared_var->semaphores->sem_processes);
-		kill(processes[i], SIGKILL);
+		waitpid(processes[i], NULL, WNOHANG);
 	}
 }
 
@@ -74,7 +72,7 @@ void create_thread(int i) {
 
 	threadIds[i] = i;
 
-	if (pthread_create(&threads[i], NULL, triageGoToWork, &threadIds[i]) != 0) {
+	if (pthread_create(&threads[i], NULL, thread_worker, &threadIds[i]) != 0) {
 		perror("Error criating triage thread!");
 		exit(0);
 	}
@@ -126,22 +124,21 @@ void init() {
 	printf("n_triage: %d\nn_doctors: %d\nshift_dur: %d\nmq_max: %d\n", shared_var->config->n_triage, shared_var->config->n_doctors, shared_var->config->shift_dur, shared_var->config->mq_max);
 	#endif
 
-	shared_var->semaphores = (Semaphores*)malloc(sizeof(struct semaphores));
-	create_semaphores();
-
 	threadIds = (int*)malloc(shared_var->config->n_triage * sizeof(int)); //aloca memoria para o numero de triagens em struct config
 	threads = (pthread_t*)malloc(shared_var->config->n_triage * sizeof(pthread_t));
 	for (i=0; i<shared_var->config->n_triage; i++)
 		create_thread(i);
 
 	processes = (pid_t*)malloc(shared_var->config->n_doctors*sizeof(pid_t));
-	while (1) {
-		printf("\nWaiting...");
-		sem_wait(shared_var->semaphores->sem_processes);
-		printf("\nResources available! Creating process...");
-		create_process(shared_var->semaphores->nextin);
-	}
+	for (i=0; i<shared_var->config->n_doctors; i++)
+		create_process(i);
 
+	while (1) {
+		for (i=0; i<shared_var->config->n_doctors; i++) {
+			if (processes[i] < 0)
+				create_process(i);
+		}
+	}
 }
 
 //processo principal
