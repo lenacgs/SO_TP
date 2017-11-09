@@ -8,18 +8,25 @@ void * thread_worker(void * triage_id) {
 }
 
 void doctor_worker() {
+
+	pthread_mutex_lock(&mutex);
 	clock_t start = clock();
 	clock_t end = clock();
 	int shift_time = (end - start) / CLOCKS_PER_SEC;
+
 	#ifdef DEBUG
-	printf("\nDoctor: %d in", getpid());
+	printf("Doctor %d: started working\n", getpid());
 	#endif
+
 	while (/*getPatientQ() && */((int)shift_time < shared_var->config->shift_dur)){
 		end = clock();
 		shift_time = (end - start) / CLOCKS_PER_SEC;
 	}
-	#ifdef DEBUG
-	printf("\nDoctor: %d out", getpid());
-	#endif
 	write_stats_docs(start, clock());
+	#ifdef DEBUG
+	printf("Doctor %d stopped working\n", getpid());
+	#endif
+
+	pthread_mutex_unlock(&mutex);
+
 }

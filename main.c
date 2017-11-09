@@ -1,8 +1,8 @@
 #include "header.h"
 
-void signal_handling(int signo) {
+void catch_ctrlc(int signum) {
 
-	if(signo == SIGINT)
+	if(signum == SIGINT)
 		#ifdef DEBUG 
 		printf("\nSignal received. Cleaning up..."); 
 		#endif
@@ -11,25 +11,25 @@ void signal_handling(int signo) {
 
 void init_signal_handling() {
 
-	signal(SIGINT, signal_handling);
+	signal(SIGINT, catch_ctrlc);
 
 }
 
 void create_semaphores() {
 
+	shared_var->semaphores->sem_processes = (sem_t*)malloc(sizeof(sem_t));
 	shared_var->semaphores->sem_processes = sem_open(SEM_PROCESSES, O_CREAT, 0666, shared_var->config->n_doctors);
 
 	if (shared_var->semaphores->sem_processes == SEM_FAILED) {
 		perror("SEM_OPEN: ");
 		return;
 	}
-	else {
-		#ifdef DEBUG
-		printf("\nSem_processes created with initial value of %d", shared_var->config->n_doctors);
-		#endif
-	}
+	#ifdef DEBUG
+	printf("\nSem_processes created with initial value of %d", shared_var->config->n_doctors);
+	#endif
 
 	shared_var->semaphores->nextin = 0;
+	shared_var->semaphores->processes = (pid_t*)malloc(shared_var->config->n_doctors*sizeof(pid_t));
 }
 
 void read_config() {
@@ -49,23 +49,24 @@ void read_config() {
 	fclose (file);
 }
 
-void create_process(int i) {
+void create_process() {
+	int i = shared_var->semaphores->nextin;
 
-	if ((processes[i] = fork()) < 0) {
+	if ((shared_var->semaphores->processes[i] = fork()) == 0) {
+		#ifdef DEBUG
+		printf("New doctor (PID %d) created\nextin", getpid());
+		#endif
+
+		doctor_worker();
+
+		sem_post(shared_var->semaphores->sem_processes);
+		exit(0);
+	}
+	else if (shared_var->semaphores->processes[i] < 0) {
 		perror("Error creating new doctor: ");
 		return;
 	}
-	else {
-		#ifdef DEBUG
-		printf("\nNew doctor:%d created.", getpid());
-		#endif
-		doctor_worker();
-		//sem_post(shared_var->semaphores->sem_processes);
-		#ifdef DEBUG
-		printf("\nDoctor: %d dying", getpid());
-		#endif
-		waitpid(processes[i], NULL, WNOHANG);
-	}
+	else if (shared_var->semaphores->processes[i] < 0) return;
 }
 
 void create_thread(int i) {
@@ -108,11 +109,17 @@ void create_shm() {
 void init() {
 	int i;
 
+    pthread_mutex_init(&mutex, NULL);
+
+	pthread_mutex_lock(&mutex);
+
 	init_signal_handling();
 
 	create_shm();
 
 	init_stats();
+
+	sleep(2);
 
 	#ifdef DEBUG
 	printf("triage_total: %d\nappointment_total:%d\n", shared_var->stats->triage_total, shared_var->stats->appointment_total);
@@ -124,22 +131,23 @@ void init() {
 	printf("n_triage: %d\nn_doctors: %d\nshift_dur: %d\nmq_max: %d\n", shared_var->config->n_triage, shared_var->config->n_doctors, shared_var->config->shift_dur, shared_var->config->mq_max);
 	#endif
 
-	threadIds = (int*)malloc(shared_var->config->n_triage * sizeof(int)); //aloca memoria para o numero de triagens em struct config
-	threads = (pthread_t*)malloc(shared_var->config->n_triage * sizeof(pthread_t));
-	for (i=0; i<shared_var->config->n_triage; i++)
-		create_thread(i);
+	shared_var->semaphores = (Semaphores*)malloc(sizeof(struct semaphores));
+	create_semaphores();
 
-	processes = (pid_t*)malloc(shared_var->config->n_doctors*sizeof(pid_t));
-	for (i=0; i<shared_var->config->n_doctors; i++)
-		create_process(i);
+	// threadIds = (int*)malloc(shared_var->config->n_triage * sizeof(int)); //aloca memoria para o numero de triagens em struct config
+	// threads = (pthread_t*)malloc(shared_var->config->n_triage * sizeof(pthread_t));
+	// for (i=0; i<shared_var->config->n_triage; i++)
+	// 	create_thread(i);
+
+	pthread_mutex_unlock(&mutex);
 
 	while (1) {
-		for (i=0; i<shared_var->config->n_doctors; i++) {
-			if (processes[i] < 0)
-				create_process(i);
-		}
+			sleep(1);
+			if (sem_wait(shared_var->semaphores->sem_processes) == -1) perror("\nsem_wait error: ");
+			create_process();
 	}
 }
+
 
 //processo principal
 int main() {

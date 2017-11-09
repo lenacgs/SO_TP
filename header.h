@@ -3,7 +3,6 @@
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/ipc.h>
-#include <sys/ipc.h>
 #include <sys/sem.h>
 #include <sys/shm.h>
 #include <pthread.h>
@@ -44,6 +43,7 @@ typedef struct config {
 typedef struct semaphores {
 	sem_t * sem_processes;
 	int nextin;
+	pid_t *processes;
 } Semaphores;
 
 typedef struct mem_cell {
@@ -54,9 +54,10 @@ typedef struct mem_cell {
 
 pthread_t *threads;
 int *threadIds;
-pid_t *processes;
 int shmid;
 mem_cell *shared_var;
+pthread_mutex_t mutex;
+
 
 void init();
 void create_thread();
