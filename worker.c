@@ -1,6 +1,7 @@
 #include "header.h"
 
 void * thread_worker(void * triage_id) {
+
 	int id = *((int*)triage_id);
 	//falta passar como argumento o parametro arrival_time do paciente, para ser escrito nas estatisticas
 	write_stats_triage(clock());
@@ -9,13 +10,12 @@ void * thread_worker(void * triage_id) {
 
 void doctor_worker() {
 
-	pthread_mutex_lock(&mutex);
 	clock_t start = clock();
 	clock_t end = clock();
 	int shift_time = (end - start) / CLOCKS_PER_SEC;
 
 	#ifdef DEBUG
-	printf("Doctor %d: started working\n", getpid());
+	printf("Doctor (PID %d) started working\n", getpid());
 	#endif
 
 	while (/*getPatientQ() && */((int)shift_time < shared_var->config->shift_dur)){
@@ -24,9 +24,6 @@ void doctor_worker() {
 	}
 	write_stats_docs(start, clock());
 	#ifdef DEBUG
-	printf("Doctor %d stopped working\n", getpid());
+	printf("Doctor (PID %d) stopped working\n", getpid());
 	#endif
-
-	pthread_mutex_unlock(&mutex);
-
 }

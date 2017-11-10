@@ -1,9 +1,7 @@
-#include <pthread.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <unistd.h>
 #include <sys/ipc.h>
-#include <sys/sem.h>
 #include <sys/shm.h>
 #include <pthread.h>
 #include <semaphore.h>
@@ -13,6 +11,7 @@
 
 #define VECTOR_SIZE 10 //number of patients
 #define DEBUG
+#define PRINT_STATS
 #define SEM_PROCESSES "sem_processes"
 
 typedef struct patient {
@@ -44,6 +43,7 @@ typedef struct semaphores {
 	sem_t * sem_processes;
 	int nextin;
 	pid_t *processes;
+	pthread_mutex_t mutex;
 } Semaphores;
 
 typedef struct mem_cell {
@@ -57,6 +57,7 @@ int *threadIds;
 int shmid;
 mem_cell *shared_var;
 pthread_mutex_t mutex;
+pid_t parentpid;
 
 
 void init();

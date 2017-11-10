@@ -1,11 +1,13 @@
 #include "header.h"
 
 void write_stats_docs(clock_t start, clock_t end) {
+	if (pthread_mutex_trylock(&shared_var->semaphores->mutex) != 0) perror("pthread_mutex_lock error: ");
 	int i = shared_var->stats->appointment_total;
-
+	shared_var->stats->appointment_total++;
 	shared_var->stats->time_beg_app[i] = start;
 	shared_var->stats->time_end_app[i] = end;
-	shared_var->stats->appointment_total++;
+	printf("appointment_total: %d\n", shared_var->stats->appointment_total);
+	if (pthread_mutex_unlock(&shared_var->semaphores->mutex) != 0) perror("pthread_mutex_unlock error: ");
 }
 
 void write_stats_triage(clock_t end) {
