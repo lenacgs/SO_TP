@@ -142,10 +142,10 @@ void init() {
 		create_thread(i);
 
 	while (1) {
-		printf("waiting...\n");
 		if (sem_wait(shared_var->semaphores->sem_processes) != 0) perror("sem_wait error: ");
-		printf("i did it!!!\n");
+		if (pthread_mutex_lock(&shared_var->semaphores->mutex) != 0) perror("pthread_mutex_lock error: ");
 		create_process();
+		if (pthread_mutex_unlock(&shared_var->semaphores->mutex) != 0) perror("pthread_mutex_unlock error: ");
 	}
 }
 

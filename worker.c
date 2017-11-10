@@ -1,8 +1,6 @@
 #include "header.h"
 
 void * thread_worker(void * triage_id) {
-
-	int id = *((int*)triage_id);
 	//falta passar como argumento o parametro arrival_time do paciente, para ser escrito nas estatisticas
 	write_stats_triage(clock());
 	return(NULL);

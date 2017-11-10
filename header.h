@@ -11,7 +11,7 @@
 
 #define VECTOR_SIZE 10 //number of patients
 #define DEBUG
-#define PRINT_STATS
+//#define PRINT_STATS
 #define SEM_PROCESSES "sem_processes"
 
 typedef struct patient {
