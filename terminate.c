@@ -3,6 +3,8 @@
 void terminate() {
 	int i;
 
+	pthread_mutex_unlock(&shared_var->semaphores->mutex);
+
 	#ifdef PRINT_STATS
 	printf("triage_total: %d\nappointment_total: %d\n", shared_var->stats->triage_total, shared_var->stats->appointment_total);
 	printf("enter queue times:\n");
@@ -33,6 +35,7 @@ void terminate() {
 	else perror("sem_unlink error: ");
 
 	if (pthread_mutex_destroy(&shared_var->semaphores->mutex) != 0) perror("pthread_mutex_error: ");
+	else printf("Mutex destroyed\n");
 
 	if (shmctl(shmid, IPC_RMID, NULL) == 0) printf("Shared memory detached\n");
 	else perror("shmctl error: ");

@@ -56,7 +56,6 @@ pthread_t *threads;
 int *threadIds;
 int shmid;
 mem_cell *shared_var;
-pthread_mutex_t mutex;
 pid_t parentpid;
 
 

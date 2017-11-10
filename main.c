@@ -141,11 +141,11 @@ void init() {
 	for (i=0; i<shared_var->config->n_triage; i++)
 		create_thread(i);
 
+	if (pthread_mutex_trylock(&shared_var->semaphores->mutex) != 0) perror("pthread_mutex_lock error: ");
 	while (1) {
 		if (sem_wait(shared_var->semaphores->sem_processes) != 0) perror("sem_wait error: ");
-		if (pthread_mutex_lock(&shared_var->semaphores->mutex) != 0) perror("pthread_mutex_lock error: ");
+		
 		create_process();
-		if (pthread_mutex_unlock(&shared_var->semaphores->mutex) != 0) perror("pthread_mutex_unlock error: ");
 	}
 }
 
