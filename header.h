@@ -61,6 +61,7 @@ pid_t parentpid;
 
 void init();
 void create_thread();
+int getPatientQ(); //isto nao vai ser int, vai ser Patient
 void create_process();
 void init_signal_handling();
 void signal_handling(int signo);

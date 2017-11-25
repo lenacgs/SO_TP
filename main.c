@@ -2,7 +2,7 @@
 
 void catch_ctrlc(int signum) {
 
-	if(signum == SIGINT)
+	if(signum == SIGINT) {
 		
 		if (getpid() == parentpid) {
 			#ifdef DEBUG 
@@ -10,6 +10,7 @@ void catch_ctrlc(int signum) {
 			#endif
 			terminate();
 		}
+	}
 }
 
 void init_signal_handling() {
@@ -141,8 +142,11 @@ void init() {
 	for (i=0; i<shared_var->config->n_triage; i++)
 		create_thread(i);
 
+	printf("Created all threads\n");
+
 	while (1) {
 		if (sem_wait(shared_var->semaphores->sem_processes) != 0) perror("sem_wait error: ");
+		printf("Going to create a new process\n");
 		
 		create_process();
 	}
