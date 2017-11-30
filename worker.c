@@ -10,20 +10,17 @@ void doctor_worker() {
 
 	clock_t start = clock();
 	clock_t end = clock();
-	clock_t shift_time = end - start;
+	int shift_time = (end - start) / CLOCKS_PER_SEC;
 
 	#ifdef DEBUG
 	printf("Doctor (PID %d) started working\n", getpid());
 	#endif
 
-	do {
-		getPatientQ();
+	while (/*getPatientQ() && */((int)shift_time < shared_var->config->shift_dur)){
 		end = clock();
-		shift_time = end - start;
-		write_stats_docs(start, end);
-	} while (shift_time < (clock_t)shared_var->config->shift_dur);
-
-	
+		shift_time = (end - start) / CLOCKS_PER_SEC;
+	}
+	write_stats_docs(start, clock());
 	#ifdef DEBUG
 	printf("Doctor (PID %d) stopped working\n", getpid());
 	#endif
