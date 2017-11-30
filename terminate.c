@@ -3,9 +3,8 @@
 void terminate() {
 	int i;
 
-	pthread_mutex_unlock(&shared_var->semaphores->mutex);
-
 	#ifdef PRINT_STATS
+	sem_wait(shared_var->semaphores->mutex);
 	printf("triage_total: %d\nappointment_total: %d\n", shared_var->stats->triage_total, shared_var->stats->appointment_total);
 	printf("enter queue times:\n");
 	for (i=0; i<shared_var->stats->appointment_total; i++)
@@ -19,6 +18,7 @@ void terminate() {
 	printf("leave appointment times:\n");
 	for (i=0; i<shared_var->stats->appointment_total; i++)
 		printf("%lu", shared_var->stats->time_end_app[i]);
+	sem_post(shared_var->semaphores->mutex);
 	#endif
 
 	#ifdef DEBUG
@@ -31,17 +31,29 @@ void terminate() {
 
 	printf("All doctors went home!\n");
 
+	for (i=0; i<shared_var->config->n_triage; i++)
+		if (threads[i] != (pthread_t)NULL) pthread_join(threads[i], NULL);
+
 	if (sem_unlink(SEM_PROCESSES) == 0)  printf("SEM_PROCESSES unlinked\n");
 	else perror("sem_unlink error: ");
+	if (sem_unlink(MUTEX) == 0) printf("MUTEX unlinked\n");
+	else perror("sem_unlink error:");
 
-	if (pthread_mutex_destroy(&shared_var->semaphores->mutex) != 0) perror("pthread_mutex_error: ");
-	else printf("Mutex destroyed\n");
 
 	if (shmctl(shmid, IPC_RMID, NULL) == 0) printf("Shared memory detached\n");
 	else perror("shmctl error: ");
 
-	for (i=0; i<shared_var->config->n_triage; i++)
-		if (threads[i] != (pthread_t)NULL) pthread_join(threads[i], NULL);
+	if (msgctl(mq_id, IPC_RMID, NULL) == -1) {
+		fprintf(stderr, "Message queue could not be deleted.\n");
+		exit(EXIT_FAILURE);
+	}
+
+	printf("Message queue was deleted.\n");
+
+	close(pipe_fd);
+
+	if (unlink(PIPE) == 0) fprintf(stderr, "Named pipe was unlinked.\n");
+	else fprintf(stderr, "Named pipe could not me unlinked.\n");
 
 	#ifdef DEBUG
 	printf("All threads joined\n");

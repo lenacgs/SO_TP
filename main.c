@@ -19,19 +19,26 @@ void init_signal_handling() {
 }
 
 void create_semaphores() {
+	sem_unlink(SEM_PROCESSES);
 	shared_var->semaphores = (Semaphores*)malloc(sizeof(struct semaphores));
-	shared_var->semaphores->sem_processes = sem_open(SEM_PROCESSES, O_CREAT, 0666, shared_var->config->n_doctors);
+	shared_var->semaphores->sem_processes = sem_open(SEM_PROCESSES, O_CREAT|O_EXCL, 0700, shared_var->config->n_doctors);
 	if (shared_var->semaphores->sem_processes == SEM_FAILED) {
-		perror("sem_open: ");
-		return;
+		perror("sem_processes creation: ");
+		exit(0);
+	}
+	sem_unlink(MUTEX);
+	shared_var->semaphores->mutex = sem_open(MUTEX, O_CREAT|O_EXCL, 0700, 1);
+	if (shared_var->semaphores->mutex == SEM_FAILED) {
+		perror("mutex creation:");
+		exit(0);
 	}
 	#ifdef DEBUG
+	printf("mutex created\n");
 	printf("sem_processes created with initial value of %d\n", shared_var->config->n_doctors);
 	#endif
 
 	shared_var->semaphores->nextin = 0;
 	shared_var->semaphores->processes = (pid_t*)malloc(shared_var->config->n_doctors*sizeof(pid_t));
-	if (pthread_mutex_init(&shared_var->semaphores->mutex, NULL) != 0) perror("pthread_mutex_t error: ");
 }
 
 void read_config() {
@@ -72,10 +79,6 @@ void create_process() {
 		printf("Doctor (PID %d) leaving\n", getpid());
 		exit(0);
 	}
-	else if (shared_var->semaphores->processes[i] < 0) {
-		perror("Error creating new doctor: ");
-		return;
-	}
 }
 
 void create_thread(int i) {
@@ -83,14 +86,12 @@ void create_thread(int i) {
 
 	if (pthread_create(&threads[i], NULL, thread_worker, &threadIds[i]) != 0) {
 		perror("Error criating triage thread: ");
-		if (pthread_mutex_unlock(&shared_var->semaphores->mutex) != 0) perror("pthread_mutex_unlock error: ");
 		exit(0);
 	}
 	
 	#ifdef DEBUG
 	printf("Triage thread created\n");
 	#endif
-	if (pthread_mutex_unlock(&shared_var->semaphores->mutex) != 0) perror("pthread_mutex_unlock error: ");
 }
 
 void init_stats() {
@@ -121,6 +122,29 @@ void create_shm() {
 
 }
 
+//creating and opening named pipe
+void create_pipe() {
+	unlink(PIPE);
+	mkfifo(PIPE, O_CREAT|O_EXCL|0666);
+
+	pipe_fd = open(PIPE, O_RDONLY|O_NONBLOCK);
+	printf("Listening...\n");
+}
+
+// void create_mq() {
+// 	mq_id = msgget(IPC_PRIVATE, IPC_CREAT|0777);
+// 	if (mq_id < 0) {
+// 		perror("mssget:");
+// 	}
+
+// }
+
+// void listening() {
+// 	while(1) {
+// 		scanf("")
+// 	}
+// }
+
 void init() {
 	int i;
 	parentpid = getpid();
@@ -135,13 +159,17 @@ void init() {
 
 	create_semaphores();
 
-	if (pthread_mutex_lock(&shared_var->semaphores->mutex) != 0) perror("pthread_mutex_lock error: ");
+	// create_pipe();
+	// pthread_t thrd;
+	// pthread_create(&thrd, NULL, listening, NULL);
+
+	// create_mq();
+
 	threadIds = (int*)malloc(shared_var->config->n_triage * sizeof(int)); //aloca memoria para o numero de triagens em struct config
 	threads = (pthread_t*)malloc(shared_var->config->n_triage * sizeof(pthread_t));
 	for (i=0; i<shared_var->config->n_triage; i++)
 		create_thread(i);
 
-	if (pthread_mutex_trylock(&shared_var->semaphores->mutex) != 0) perror("pthread_mutex_lock error: ");
 	while (1) {
 		if (sem_wait(shared_var->semaphores->sem_processes) != 0) perror("sem_wait error: ");
 		

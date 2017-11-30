@@ -7,12 +7,19 @@
 #include <semaphore.h>
 #include <time.h>
 #include <signal.h>
+#include <sys/msg.h>
+#include <fcntl.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+
 
 
 #define VECTOR_SIZE 10 //number of patients
 #define DEBUG
-//#define PRINT_STATS
+#define PRINT_STATS
 #define SEM_PROCESSES "sem_processes"
+#define MUTEX "mutex"
+#define PIPE "input_pipe"
 
 typedef struct patient {
 	char * name;
@@ -43,7 +50,7 @@ typedef struct semaphores {
 	sem_t * sem_processes;
 	int nextin;
 	pid_t *processes;
-	pthread_mutex_t mutex;
+	sem_t * mutex;
 } Semaphores;
 
 typedef struct mem_cell {
@@ -52,6 +59,7 @@ typedef struct mem_cell {
 	Semaphores * semaphores;
 } mem_cell;
 
+int pipe_fd, mq_id;
 pthread_t *threads;
 int *threadIds;
 int shmid;

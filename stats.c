@@ -1,20 +1,29 @@
 #include "header.h"
 
 void write_stats_docs(clock_t start, clock_t end) {
-	int i = shared_var->stats->appointment_total;
+	int i;
+
+	sem_wait(shared_var->semaphores->mutex);
+	i = shared_var->stats->appointment_total;
+	printf("\tprocesses  i:%d\n", shared_var->stats->appointment_total);
+	// shared_var->stats->time_beg_app[i] = start;
+	// shared_var->stats->time_end_app[i] = end;
 	shared_var->stats->appointment_total++;
-	shared_var->stats->time_beg_app[i] = start;
-	shared_var->stats->time_end_app[i] = end;
+	sem_post(shared_var->semaphores->mutex);
 }
 
 void write_stats_triage(clock_t end) {
 	int i;
 
-	i = shared_var->stats->triage_total;
+	sem_wait(shared_var->semaphores->mutex);
 
-	shared_var->stats->time_mqueue[i] = end;
+	i = shared_var->stats->triage_total;
+	printf("\tthreads i: %d\n", i);
+
+	// shared_var->stats->time_mqueue[i] = end;
 
 	shared_var->stats->triage_total++;
+	sem_post(shared_var->semaphores->mutex);
 }
 
 void print_stats() {
