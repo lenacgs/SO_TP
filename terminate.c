@@ -21,6 +21,8 @@ void terminate() {
 	sem_post(shared_var->semaphores->mutex);
 	#endif
 
+	pthread_kill(listening_thread, SIGKILL);
+
 	#ifdef DEBUG
 	printf("Waiting for all doctors to finish work...\n");
 	#endif
@@ -37,23 +39,22 @@ void terminate() {
 	if (sem_unlink(SEM_PROCESSES) == 0)  printf("SEM_PROCESSES unlinked\n");
 	else perror("sem_unlink error: ");
 	if (sem_unlink(MUTEX) == 0) printf("MUTEX unlinked\n");
-	else perror("sem_unlink error:");
+	else perror("sem_unlink error");
+	if (sem_unlink(SEM_PATIENTS_QUEUE) == 0)  printf("SEM_PATIENTS_QUEUE unlinked\n");
+	else perror("sem_unlink error: ");
 
 
 	if (shmctl(shmid, IPC_RMID, NULL) == 0) printf("Shared memory detached\n");
-	else perror("shmctl error: ");
+	else perror("shmctl error");
 
-	if (msgctl(mq_id, IPC_RMID, NULL) == -1) {
-		fprintf(stderr, "Message queue could not be deleted.\n");
-		exit(EXIT_FAILURE);
-	}
+	if (msgctl(mq_id, IPC_RMID, 0) == 0)
+		printf("Message queue was deleted.\n");
+	else perror("Message queue could not be deleted"); 
 
-	printf("Message queue was deleted.\n");
+	//close(pipe_fd);
 
-	close(pipe_fd);
-
-	if (unlink(PIPE) == 0) fprintf(stderr, "Named pipe was unlinked.\n");
-	else fprintf(stderr, "Named pipe could not me unlinked.\n");
+	if (unlink(PIPE) == 0) printf("Named pipe was unlinked\n");
+	else perror("Named pipe could not be unlinked");
 
 	#ifdef DEBUG
 	printf("All threads joined\n");

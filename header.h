@@ -11,7 +11,8 @@
 #include <fcntl.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-
+#include <string.h>
+#include <ctype.h>
 
 
 #define VECTOR_SIZE 10 //number of patients
@@ -20,15 +21,23 @@
 #define SEM_PROCESSES "sem_processes"
 #define MUTEX "mutex"
 #define PIPE "input_pipe"
+#define BUFFER_SIZE 256
+#define SEM_PATIENTS_QUEUE "sem_patients_queue"
 
 typedef struct patient {
 	char * name;
-	int arrival; //order
 	clock_t arrival_time; //in seconds
 	int triage; //in seconds
 	int appointment; //in seconds
 	int priority; //1, 2 or 3
 } Patient;
+
+typedef struct queue_node *next_node;
+typedef struct queue_node {
+	Patient *patient;
+	next_node next;
+} queue_node;
+
 
 typedef struct stats { //guarda as informações de todos os pacientes
 	int triage_total; //incrementada sempre que um paciente é triado
@@ -59,14 +68,22 @@ typedef struct mem_cell {
 	Semaphores * semaphores;
 } mem_cell;
 
-int pipe_fd, mq_id;
+int mq_id;
 pthread_t *threads;
 int *threadIds;
-int shmid;
+int shmid, patient_id;
 mem_cell *shared_var;
 pid_t parentpid;
+pthread_t listening_thread;
+queue_node * triage_queue; //ponteiro para o inicio da queue
+sem_t * sem_queue;
 
-
+void * listening();
+queue_node *get_node();
+void add_node(queue_node* node);
+void create_patient(int id, int t_triage, int t_appt, int priority);
+void new_group(char*line);
+void new_patient(char *line);
 void init();
 void create_thread();
 void create_process();
